@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/roznica_wysokosci_oraz_pole_powierzchni" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>

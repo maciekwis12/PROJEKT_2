@@ -60,7 +60,7 @@ class RoznicaWysokosciOrazPolePowierzchniDialog(QtWidgets.QDialog, FORM_CLASS):
     
             # Obliczanie różnicy wysokości między dwoma punktami
             delta_h = wysokosci_punktow[0] - wysokosci_punktow[1]
-            self.textEdit_pokaz_roznice_wysokosci.setText(f"Różnica wysokości: {delta_h}")
+            self.textEdit_pokaz_roznice_wysokosci.setText(f"Różnica wysokości: {delta_h} [m]")
         else:
             self.textEdit_pokaz_roznice_wysokosci.setText("Zaznacz dokładnie dwa punkty.")
     
@@ -91,6 +91,6 @@ class RoznicaWysokosciOrazPolePowierzchniDialog(QtWidgets.QDialog, FORM_CLASS):
             sum2 = sum(x_punktow[i + 1] * y_punktow[i] for i in range(len(x_punktow) - 1))
             
             pole = 0.5 * abs(sum1 - sum2)
-            self.textEdit_pokaz_pole_powierzchni.setText(f"Pole powierzchni: {pole}")
+            self.textEdit_pokaz_pole_powierzchni.setText(f"Pole powierzchni: {pole} [m^2]")
         else:
             self.textEdit_pokaz_pole_powierzchni.setText("Zaznacz dokładnie trzy punkty.")

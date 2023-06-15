@@ -27,6 +27,7 @@ import os
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.utils import iface
+from qgis.core import QgsPointXY, QgsWkbTypes
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -64,33 +65,41 @@ class RoznicaWysokosciOrazPolePowierzchniDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.textEdit_pokaz_roznice_wysokosci.setText("Zaznacz dokładnie dwa punkty.")
     
+    
     def oblicz_pole_powierzchni_gauss(self):
         canvas = iface.mapCanvas()
         warstwa = canvas.currentLayer()
-        atrybuty = warstwa.selectedFeatures()
         
-        if len(atrybuty) == 3:
-            atrybut_x = "Wspolrzedna X"
-            x_punktow = []
+        
+        if warstwa.geometryType() == QgsWkbTypes.PointGeometry:
+            atrybuty = warstwa.selectedFeatures()
+            
+            # Pobieranie współrzędnych punktu
+            punkty = []
             for atrybut in atrybuty:
-                x = atrybut[atrybut_x]
-                x_punktow.append(x)
+                # Pobieranie geometrii punktu
+                geometria = atrybut.geometry()
+        
+                # Pobieranie współrzędnych punktu
+                punkt = geometria.asPoint()
+        
+        
+                # Dodawanie współrzędnych do listy punktów
+                punkty.append((punkt.x(), punkt.y()))
                 
-            atrybut_y = "Wspolrzedna Y"
-            y_punktow = [] 
-            for atrybut in atrybuty:
-                 y = atrybut[atrybut_y]
-                 y_punktow.append(y)
-            
-            
-            x_punktow.append(x_punktow[0])
-            y_punktow.append(y_punktow[0])
+            n = len(punkty)
         
-            # Obliczamy sumę iloczynów współrzędnych punktów
-            sum1 = sum(x_punktow[i] * y_punktow[i + 1] for i in range(len(x_punktow) - 1))
-            sum2 = sum(x_punktow[i + 1] * y_punktow[i] for i in range(len(x_punktow) - 1))
-            
-            pole = 0.5 * abs(sum1 - sum2)
-            self.textEdit_pokaz_pole_powierzchni.setText(f"Pole powierzchni: {pole} [m^2]")
+            # Dodajemy pierwszy punkt na koniec listy
+            punkty.append(punkty[0])
+        
+            suma = 0.0
+            for i in range(n):
+                suma += (punkty[i+1][0] + punkty[i][0]) * (punkty[i+1][1] - punkty[i][1])
+        
+            pole_powierzchni = abs(suma) / 2.0
+            self.textEdit_pokaz_pole_powierzchni.setText(f"Pole powierzchni: {pole_powierzchni} [m^2]")
+        
         else:
-            self.textEdit_pokaz_pole_powierzchni.setText("Zaznacz dokładnie trzy punkty.")
+            self.textEdit_pokaz_pole_powierzchni.setText("Warstwa nie jest warstwą punktową.")
+        
+
